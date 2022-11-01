@@ -16,13 +16,13 @@ type ListNode[T any] struct {
 }
 
 // Lock Free stack LinkedList
-type LockFreeStackLinked[T any] struct {
+type CasLockFreeStackLinked[T any] struct {
 	top  atomic.Pointer[ListNode[T]]
 	size atomic.Uint64
 }
 
 // Put a value of type T to the stack
-func (stack *LockFreeStackLinked[T]) Put(val T) {
+func (stack *CasLockFreeStackLinked[T]) Put(val T) {
 	for {
 		var topList *ListNode[T] = stack.top.Load()
 		var node *ListNode[T] = &ListNode[T]{val: val, next: topList}
@@ -32,11 +32,12 @@ func (stack *LockFreeStackLinked[T]) Put(val T) {
 			stack.size.Add(1)
 			return
 		}
+		node = nil
 	}
 }
 
 // Popout the top value from the stack
-func (stack *LockFreeStackLinked[T]) Pop() (T, bool) {
+func (stack *CasLockFreeStackLinked[T]) Pop() (T, bool) {
 	for {
 		var topList *ListNode[T] = stack.top.Load()
 		if topList == nil {
@@ -54,17 +55,17 @@ func (stack *LockFreeStackLinked[T]) Pop() (T, bool) {
 }
 
 // Returns the size of the stack
-func (stack *LockFreeStackLinked[T]) Size() uint64 {
+func (stack *CasLockFreeStackLinked[T]) Size() uint64 {
 	return stack.size.Load()
 }
 
 // Check if the stack is empty or not
-func (stack *LockFreeStackLinked[T]) Empty() bool {
+func (stack *CasLockFreeStackLinked[T]) Empty() bool {
 	return stack.size.Load() == 0
 }
 
 // Peek the top element in the stack
-func (stack *LockFreeStackLinked[T]) Peek() (T, bool) {
+func (stack *CasLockFreeStackLinked[T]) Peek() (T, bool) {
 	var top *ListNode[T] = stack.top.Load()
 	if top == nil {
 		var zero T

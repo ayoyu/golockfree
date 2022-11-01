@@ -10,7 +10,7 @@ import (
 func TestConcurrent_Put_Then_Pop(t *testing.T) {
 	var size uint64 = 1000
 	var wait sync.WaitGroup
-	stack := LockFreeStackLinked[int]{}
+	stack := CasLockFreeStackLinked[int]{}
 	for i := 0; i < int(size); i++ {
 		wait.Add(1)
 		go func(i int) {
@@ -37,7 +37,7 @@ func TestConcurrent_Put_Then_Pop(t *testing.T) {
 
 func TestConcurrent_Put_Peek_Pop(t *testing.T) {
 	var size uint64 = 1000
-	stack := LockFreeStackLinked[int]{}
+	stack := CasLockFreeStackLinked[int]{}
 	var wait sync.WaitGroup
 	for i := 0; i < int(size); i++ {
 		wait.Add(1)
